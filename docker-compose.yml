@@ -1,31 +1,28 @@
-version: '3.8'
-
 services:
   db:
-    image: postgres
+    image: postgres:17
     environment:
-      POSTGRES_DB: max_way_db
-      POSTGRES_USER: max_way_user
-      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   web:
     build: .
+    env_file: .env
+    environment:
+      DB_HOST: db
     command: >
-      bash -c "
-        python3 manage.py migrate &&
-        python3 manage.py collectstatic --no-input &&
-        python3 manage.py init_superuser &&
-        gunicorn --reload -b 0.0.0.0:8000 config.wsgi --workers 1 --timeout 300 --log-level DEBUG
-      "
+      bash -c "python3 manage.py migrate &&
+               python3 manage.py collectstatic --no-input &&
+               gunicorn -b 0.0.0.0:8000 config.wsgi --workers 2 --timeout 300"
     volumes:
-      - .:/code
+      - ./media:/code/media
     ports:
-      - 8000:8000
+      - "8000:8000"
     depends_on:
       - db
-    environment:
-      DB_NAME: max_way_db
-      DB_USER: max_way_user
-      DB_PASSWORD: root
-      DB_HOST: db
-      DB_PORT: 5432
+
+volumes:
+  pgdata:

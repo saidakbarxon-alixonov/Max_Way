@@ -4,6 +4,7 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+python-dotenv==1.x.x
 
 # Virtual environments and secrets
 .venv/
