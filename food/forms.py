@@ -1,24 +1,21 @@
 from django import forms
-from .models import *
+from .models import Customer, Order
+
 
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = "__all__"
+        fields = ["first_name", "last_name", "phone_number"]
+
 
 class OrderForm(forms.ModelForm):
-    class Meta:
-        model= Order
-        fields="__all__"
+    # Only these two values are accepted (1 = cash, 2 = terminal).
+    payment_type = forms.TypedChoiceField(
+        choices=[(1, "Cash"), (2, "Terminal")],
+        coerce=int,
+    )
 
-    def save(self, commit=True, *args, **kwargs):
-        model = super().save(commit=False)
-        model.customer = kwargs.get("customer", None)
-        if commit:
-            model.save()
-        return model
-
-class OrderProductForm(forms.ModelForm):
     class Meta:
-        model = OrderProduct
-        fields = "__all__"
+        model = Order
+        # `status` and `customer` are set by the server, never by the browser.
+        fields = ["payment_type", "address"]
