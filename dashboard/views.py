@@ -1,8 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from food.models import *
 from django.contrib.auth import login, logout,authenticate
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
 from . import forms
 from . import services
 
@@ -17,7 +16,6 @@ def main_dashboard(request):
     orders = Order.objects.all()
     categories_products = []
     table_list=services.get_table()
-    print(table_list)
     for category in categories:
         categories_products.append(
             {
@@ -69,7 +67,7 @@ def user_list(request):
     ctx = {
         'users':users
     }
-    return render(request, "dashboard/user/list.html",ctx)\
+    return render(request, "dashboard/user/list.html",ctx)
 
 @login_required_decarator
 def order_list(request):
@@ -95,7 +93,7 @@ def user_create(request):
 
 @login_required_decarator
 def user_edit(request, pk):
-    model = Customer.objects.get(pk=pk)
+    model = get_object_or_404(Customer, pk=pk)
     form = forms.UserForm(request.POST or None, instance=model)
 
     if request.POST and form.is_valid():
@@ -109,9 +107,9 @@ def user_edit(request, pk):
 
 @login_required_decarator
 def user_delete(request,pk):
-    model = Customer.objects.get(pk=pk)
+    model = get_object_or_404(Customer, pk=pk)
     model.delete()
-    return  redirect("category_list")
+    return redirect("user_list")
 
 @login_required_decarator
 def category_create(request):
@@ -129,7 +127,7 @@ def category_create(request):
 
 @login_required_decarator
 def category_edit(request,pk):
-    model = Category.objects.get(pk=pk)
+    model = get_object_or_404(Category, pk=pk)
     form = forms.CategoryForm(request.POST or None, instance=model)
 
     if request.POST and form.is_valid():
@@ -143,7 +141,7 @@ def category_edit(request,pk):
 
 @login_required_decarator
 def category_delete(request,pk):
-    model = Category.objects.get(pk=pk)
+    model = get_object_or_404(Category, pk=pk)
     model.delete()
     return  redirect("category_list")
 #############product#########################################
@@ -171,7 +169,7 @@ def product_create(request):
 
 @login_required_decarator
 def product_edit(request,pk):
-    model = Product.objects.get(pk=pk)
+    model = get_object_or_404(Product, pk=pk)
     form = forms.ProductForm(request.POST or None,request.FILES or None, instance=model)
 
     if request.POST and form.is_valid():
@@ -185,7 +183,7 @@ def product_edit(request,pk):
 
 @login_required_decarator
 def product_delete(request,pk):
-    model = Product.objects.get(pk=pk)
+    model = get_object_or_404(Product, pk=pk)
     model.delete()
     return  redirect("product_list")
 

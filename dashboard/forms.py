@@ -28,10 +28,11 @@ class ProductForm(forms.ModelForm):
     }
 
 class UserForm(forms.ModelForm):
-    model = Customer
-    field = "__all__"
-    widjets = {
-        "first_name": forms.TextInput(attrs={'class': 'form-control'}),
-        "last_name": forms.TextInput(attrs={'class': 'form-control'}),
-        "phone_number": forms.TextInput(attrs={'class': 'form-control'}),
-    }
+    class Meta:
+        model = Customer
+        fields = ["first_name", "last_name", "phone_number"]
+        widgets = {
+            "first_name": forms.TextInput(attrs={'class': 'form-control'}),
+            "last_name": forms.TextInput(attrs={'class': 'form-control'}),
+            "phone_number": forms.TextInput(attrs={'class': 'form-control'}),
+        }
