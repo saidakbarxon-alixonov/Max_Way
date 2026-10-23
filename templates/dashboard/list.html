@@ -1,0 +1,153 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize mathfilters %}
+{# One page for every list. The view passes: kind, title and page (a Django Page or a plain list). #}
+{# kind is one of: category, product, user, order, customer_order, productorder #}
+
+{% block page_actions %}
+{% if kind == 'category' %}
+<a class="au-btn au-btn-icon au-btn--blue" href="{% url 'category_create' %}"><i class="zmdi zmdi-plus"></i>add</a>
+{% elif kind == 'product' %}
+<a class="au-btn au-btn-icon au-btn--blue" href="{% url 'product_create' %}"><i class="zmdi zmdi-plus"></i>add</a>
+{% elif kind == 'user' %}
+<a class="au-btn au-btn-icon au-btn--blue" href="{% url 'user_create' %}"><i class="zmdi zmdi-plus"></i>add</a>
+{% elif kind == 'customer_order' %}
+<a class="au-btn au-btn-icon au-btn--blue" href="{% url 'user_list' %}"><i class="zmdi zmdi-arrow-left"></i>back</a>
+{% elif kind == 'productorder' %}
+<a class="au-btn au-btn-icon au-btn--blue" href="{% url 'order_list' %}"><i class="zmdi zmdi-arrow-left"></i>back</a>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive m-b-40">
+            <table class="table table-borderless table-data3">
+                <thead>
+                    <tr>
+                        {% if kind == 'category' %}
+                        <th>#</th><th>Name</th><th>Created at</th><th></th>
+                        {% elif kind == 'product' %}
+                        <th>#</th><th>Image</th><th>Title</th><th>Description</th><th>Cost</th><th>Price</th><th>Created at</th><th></th>
+                        {% elif kind == 'user' %}
+                        <th>#</th><th>First name</th><th>Last name</th><th>Phone number</th><th>Created at</th><th></th>
+                        {% elif kind == 'order' %}
+                        <th>#</th><th>Customer</th><th>Address</th><th>Payment type</th><th>Total</th><th>Created at</th><th>Cart</th>
+                        {% elif kind == 'customer_order' %}
+                        <th>#</th><th>First name</th><th>Last name</th><th>Address</th><th>Status</th><th>Payment type</th><th>Created at</th><th>Cart</th>
+                        {% else %}
+                        <th>Product</th><th>Price</th><th>Count</th><th>Total</th><th>Created at</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for obj in page %}
+                    <tr>
+                        {% if kind == 'category' %}
+                        <td>{{ obj.id }}</td>
+                        <td>{{ obj.title }}</td>
+                        <td>{{ obj.created_at }}</td>
+                        {% url 'category_edit' pk=obj.id as edit_url %}
+                        {% url 'category_delete' pk=obj.id as delete_url %}
+
+                        {% elif kind == 'product' %}
+                        <td>{{ obj.id }}</td>
+                        <td>
+                            {% if obj.image %}
+                            <img class="product-thumb img-thumbnail" loading="lazy" src="{{ obj.image.url }}" alt="{{ obj.title }}">
+                            {% endif %}
+                        </td>
+                        <td>{{ obj.title }}</td>
+                        <td>{{ obj.description }}</td>
+                        <td>{{ obj.cost }}</td>
+                        <td>{{ obj.price }}</td>
+                        <td>{{ obj.created_at }}</td>
+                        {% url 'product_edit' pk=obj.id as edit_url %}
+                        {% url 'product_delete' pk=obj.id as delete_url %}
+
+                        {% elif kind == 'user' %}
+                        <td>{{ obj.id }}</td>
+                        <td><a href="{% url 'customer_order_list' id=obj.id %}">{{ obj.first_name }}</a></td>
+                        <td>{{ obj.last_name }}</td>
+                        <td>{{ obj.phone_number }}</td>
+                        <td>{{ obj.created_at }}</td>
+                        {% url 'user_edit' pk=obj.id as edit_url %}
+                        {% url 'user_delete' pk=obj.id as delete_url %}
+
+                        {% elif kind == 'order' %}
+                        <td>{{ obj.id }}</td>
+                        <td>
+                            {% if obj.customer %}
+                            <a href="{% url 'customer_order_list' id=obj.customer_id %}">{{ obj.customer }}</a>
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                        <td>{{ obj.address }}</td>
+                        <td>{% if obj.payment_type == 1 %}naqd{% else %}karta{% endif %}</td>
+                        <td>{{ obj.total|default:0|intcomma }}</td>
+                        <td>{{ obj.created_at }}</td>
+                        <td><a href="{% url 'orderproduct_list' id=obj.id %}"><i class="fas fa-eye fa-lg" style="color:grey"></i></a></td>
+
+                        {% elif kind == 'customer_order' %}
+                        <td>{{ obj.id }}</td>
+                        <td>{{ obj.first_name }}</td>
+                        <td>{{ obj.last_name }}</td>
+                        <td>{{ obj.address }}</td>
+                        <td>{{ obj.status }}</td>
+                        <td>{% if obj.payment_type == 1 %}naqd{% else %}karta{% endif %}</td>
+                        <td>{{ obj.created_at }}</td>
+                        <td><a href="{% url 'orderproduct_list' id=obj.id %}"><i class="fas fa-eye fa-lg" style="color:grey"></i></a></td>
+
+                        {% else %}
+                        <td>{{ obj.title }}</td>
+                        <td>{{ obj.price }}</td>
+                        <td>{{ obj.count }}</td>
+                        <td>{{ obj.count|mul:obj.price }}</td>
+                        <td>{{ obj.created_at }}</td>
+                        {% endif %}
+
+                        {# edit and delete buttons: only for categories, products and customers #}
+                        {% if kind == 'category' or kind == 'product' or kind == 'user' %}
+                        <td>
+                            <div class="table-data-feature">
+                                <a class="item" data-toggle="tooltip" href="{{ edit_url }}" data-placement="top" title="" data-original-title="Edit">
+                                    <i class="zmdi zmdi-edit text-warning"></i>
+                                </a>
+                                <form method="post" action="{{ delete_url }}" data-confirm="Delete #{{ obj.id }}? This cannot be undone.">
+                                    {% csrf_token %}
+                                    <button type="submit" class="item" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete">
+                                        <i class="zmdi zmdi-delete text-danger"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if kind == 'category' %}4{% elif kind == 'product' %}8{% elif kind == 'user' %}6{% elif kind == 'order' %}7{% elif kind == 'customer_order' %}8{% else %}5{% endif %}" class="text-center">Nothing here yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {# previous / next links (only for paginated lists) #}
+        {% if page.has_other_pages %}
+        <nav aria-label="Pages">
+            <ul class="pagination justify-content-center">
+                {% if page.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page.previous_page_number }}">&laquo; Previous</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">&laquo; Previous</span></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">{{ page.number }} / {{ page.paginator.num_pages }}</span></li>
+                {% if page.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page.next_page_number }}">Next &raquo;</a></li>
+                {% else %}
+                <li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

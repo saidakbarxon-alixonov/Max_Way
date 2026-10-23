@@ -1,0 +1,19 @@
+{# The menu items, used by the desktop sidebar and the mobile menu. #}
+{# The active item is found from the URL name: category_*, product_*, user_* / customer_order_list, order_* / orderproduct_list #}
+{% with current=request.resolver_match.url_name|default:'' %}
+<li{% if current == 'main_dashboard' %} class="active"{% endif %}>
+    <a href="{% url 'main_dashboard' %}"><i class="fas fa-tachometer-alt"></i>Dashboard</a>
+</li>
+<li{% if current|slice:":8" == "category" %} class="active"{% endif %}>
+    <a href="{% url 'category_list' %}"><i class="fas fa-tags"></i>Categories</a>
+</li>
+<li{% if current|slice:":7" == "product" %} class="active"{% endif %}>
+    <a href="{% url 'product_list' %}"><i class="fas fa-cube"></i>Products</a>
+</li>
+<li{% if current|slice:":4" == "user" or current|slice:":8" == "customer" %} class="active"{% endif %}>
+    <a href="{% url 'user_list' %}"><i class="fas fa-users"></i>Customers</a>
+</li>
+<li{% if current|slice:":5" == "order" %} class="active"{% endif %}>
+    <a href="{% url 'order_list' %}"><i class="fas fa-shopping-cart"></i>Orders</a>
+</li>
+{% endwith %}

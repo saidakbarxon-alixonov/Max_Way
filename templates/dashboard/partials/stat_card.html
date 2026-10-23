@@ -1,0 +1,17 @@
+{% load humanize %}
+<div class="col-sm-6 col-lg-3">
+    <div class="overview-item overview-item--{{ color }}">
+        <div class="overview__inner">
+            <div class="overview-box clearfix">
+                <div class="icon">
+                    <i class="fa {{ icon }}"></i>
+                </div>
+                <div class="text">
+                    <h2>{{ value|intcomma }}</h2>
+                    <span>{{ label }}</span>
+                </div>
+            </div>
+            <div class="overview-chart"></div>
+        </div>
+    </div>
+</div>
