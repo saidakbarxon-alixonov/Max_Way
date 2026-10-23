@@ -1,0 +1,9 @@
+.table-data-feature form { display: inline-block; margin: 0; }
+.table-data-feature button.item { padding: 0; cursor: pointer; }
+.product-thumb { width: 180px; max-width: 100%; height: auto; }
+.mobile-bar { background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+.mobile-bar__head { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; }
+.mobile-bar__toggle { border: 0; background: none; font-size: 22px; line-height: 1; cursor: pointer; }
+.mobile-bar__nav a { display: block; padding: 12px 20px; color: #555; border-top: 1px solid #eee; }
+.mobile-bar__nav li.active a { color: #4272d7; font-weight: 600; }
+.mobile-bar__nav i { width: 26px; }
