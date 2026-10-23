@@ -7,3 +7,11 @@
 .mobile-bar__nav a { display: block; padding: 12px 20px; color: #555; border-top: 1px solid #eee; }
 .mobile-bar__nav li.active a { color: #4272d7; font-weight: 600; }
 .mobile-bar__nav i { width: 26px; }
+
+/* Below 992 px the new .mobile-bar replaces the theme's fixed mobile header,
+   so the page content must not be pushed down for that header any more. */
+@media (max-width: 991px) {
+    .header-desktop { display: none; }
+    .page-container { top: 0; }
+    .main-content { padding-top: 30px; }
+}

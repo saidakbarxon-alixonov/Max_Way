@@ -18,6 +18,7 @@ local_settings.py
 /staticfiles/
 /media/
 /static/admin
+*.zip
 
 # Editors and test tools
 .idea/
